@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
   Image,
@@ -15,11 +16,12 @@ import { Brand } from '@/components/Brand';
 import { LoginModal } from '@/components/LoginModal';
 import { navItems } from '@/data/home';
 
-const heroImage = require('../../assets/images/nam-duong-hero.png');
-const bannerImage2 = require('../../assets/images/salon-banner-2.png');
-const bannerImage3 = require('../../assets/images/salon-banner-3.png');
+const heroImage = require('../../assets/images/trangchu1.jpg');
+const bannerImage2 = require('../../assets/images/trangchu2.png');
+const bannerImage3 = require('../../assets/images/trangchu3.webp');
 
 export default function HomeScreen() {
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isMobile = width < 760;
   const isTablet = width < 1040;
@@ -45,12 +47,16 @@ export default function HomeScreen() {
             {!isTablet && (
               <View style={styles.desktopNav}>
                 {navItems.map((item) => (
-                  <View key={item.key} style={styles.navItem}>
-                    <Text style={[styles.navText, item.key === 'home' && styles.navTextActive]}>
-                      {item.label}
-                    </Text>
-                    {item.key === 'home' && <View style={styles.navUnderline} />}
-                  </View>
+                  item.key === 'booking' || item.key === 'trends' || item.key === 'stores' || item.key === 'contact' ? (
+                    <Pressable key={item.key} onPress={() => router.push(item.key === 'booking' ? '/booking' : item.key === 'trends' ? '/trends' : item.key === 'stores' ? '/stores' : '/contact')} style={styles.navItem}>
+                      <Text style={styles.navText}>{item.label}</Text>
+                    </Pressable>
+                  ) : (
+                    <View key={item.key} style={styles.navItem}>
+                      <Text style={[styles.navText, item.key === 'home' && styles.navTextActive]}>{item.label}</Text>
+                      {item.key === 'home' && <View style={styles.navUnderline} />}
+                    </View>
+                  )
                 ))}
               </View>
             )}
@@ -69,11 +75,15 @@ export default function HomeScreen() {
           {isTablet && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.mobileNav}>
               {navItems.map((item) => (
-                <View key={item.key} style={[styles.mobileNavItem, item.key === 'home' && styles.mobileNavItemActive]}>
-                  <Text style={[styles.mobileNavText, item.key === 'home' && styles.mobileNavTextActive]}>
-                    {item.label}
-                  </Text>
-                </View>
+                item.key === 'booking' || item.key === 'trends' || item.key === 'stores' || item.key === 'contact' ? (
+                  <Pressable key={item.key} onPress={() => router.push(item.key === 'booking' ? '/booking' : item.key === 'trends' ? '/trends' : item.key === 'stores' ? '/stores' : '/contact')} style={styles.mobileNavItem}>
+                    <Text style={styles.mobileNavText}>{item.label}</Text>
+                  </Pressable>
+                ) : (
+                  <View key={item.key} style={[styles.mobileNavItem, item.key === 'home' && styles.mobileNavItemActive]}>
+                    <Text style={[styles.mobileNavText, item.key === 'home' && styles.mobileNavTextActive]}>{item.label}</Text>
+                  </View>
+                )
               ))}
             </ScrollView>
           )}
@@ -84,21 +94,18 @@ export default function HomeScreen() {
             <ImageBackground
               source={heroImage}
               resizeMode="cover"
-              style={[styles.hero, isMobile && styles.heroMobile]}
+              style={[styles.hero, isMobile && styles.heroMobile, isMobile && { height: width - 40 }]}
               imageStyle={styles.heroImage}
             >
               <View style={styles.heroShade} />
               <View style={[styles.heroContent, isMobile && styles.heroContentMobile]}>
-                <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile]}>
-                  ĐẸP CHUẨN MEN,{`\n`}TỰ TIN MỖI NGÀY
-                </Text>
                 <Text style={[styles.heroCopy, isMobile && styles.heroCopyMobile]}>
                   Trải nghiệm dịch vụ tóc nam chuyên nghiệp trong không gian hiện đại và thư giãn.
                 </Text>
-                <View style={styles.bookingButton}>
+                <Pressable onPress={() => router.push('/booking')} style={styles.bookingButton}>
                   <Text style={styles.bookingButtonText}>ĐẶT LỊCH NGAY</Text>
                   <Ionicons name="arrow-forward" size={18} color="#102A43" />
-                </View>
+                </Pressable>
               </View>
             </ImageBackground>
 
@@ -135,9 +142,13 @@ export default function HomeScreen() {
       <LoginModal
         visible={loginVisible}
         onClose={() => setLoginVisible(false)}
-        onLogin={(name) => {
-          setUserName(name);
+        onLogin={(name, role) => {
           setLoginVisible(false);
+          if (role === 'employee') {
+            router.replace('/employee');
+            return;
+          }
+          setUserName(name);
         }}
       />
     </View>
@@ -177,28 +188,26 @@ const styles = StyleSheet.create({
   bannerGrid: { maxWidth: 1500, width: '100%', alignSelf: 'center', flexDirection: 'row', gap: 14 },
   bannerGridMobile: { flexDirection: 'column' },
   hero: { flex: 2, minHeight: 360, overflow: 'hidden', justifyContent: 'center' },
-  heroMobile: { width: '100%', minHeight: 380, flex: 0 },
+  heroMobile: { width: '100%', minHeight: 0, flexGrow: 0, flexShrink: 0, flexBasis: 'auto' },
   heroImage: { borderRadius: 25 },
-  heroShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: 25, backgroundColor: 'rgba(5, 20, 34, 0.13)' },
-  heroContent: { maxWidth: 590, paddingHorizontal: 52, paddingVertical: 42 },
-  heroContentMobile: { paddingHorizontal: 25, paddingVertical: 42, maxWidth: '92%' },
-  heroTitle: { color: '#FFFFFF', fontSize: 42, lineHeight: 49, fontWeight: '900', letterSpacing: -1.4 },
-  heroTitleMobile: { fontSize: 34, lineHeight: 40, letterSpacing: -1 },
-  heroCopy: { color: '#DCE6EE', maxWidth: 470, fontSize: 15, lineHeight: 23, marginTop: 15 },
+  heroShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: 25, backgroundColor: 'rgba(255, 255, 255, 0.12)' },
+  heroContent: { maxWidth: 590, paddingHorizontal: 52, paddingVertical: 42, transform: [{ translateY: 78 }] },
+  heroContentMobile: { position: 'absolute', left: 25, right: 25, top: '60%', paddingHorizontal: 0, paddingVertical: 0, maxWidth: 590, transform: [{ translateY: 0 }] },
+  heroCopy: { color: '#1A1A1A', maxWidth: 470, fontSize: 15, lineHeight: 23, marginTop: 15 },
   heroCopyMobile: { fontSize: 15, lineHeight: 23 },
-  bookingButton: { alignSelf: 'flex-start', minHeight: 47, borderRadius: 12, backgroundColor: '#F2B84B', paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 23 },
+  bookingButton: { alignSelf: 'flex-start', minHeight: 47, borderRadius: 12, backgroundColor: '#F2B84B', paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 9 },
   bookingButtonText: { color: '#102A43', fontSize: 13, fontWeight: '900', letterSpacing: 0.4 },
   secondaryColumn: { flex: 1, gap: 14 },
   secondaryColumnMobile: { flexDirection: 'row', width: '100%' },
   secondaryBanner: { flex: 1, minHeight: 173, overflow: 'hidden', borderRadius: 20 },
   secondaryPhoto: { width: '100%', height: '100%' },
   footer: { backgroundColor: '#111316', minHeight: 270, paddingHorizontal: '8%', paddingVertical: 42, alignItems: 'center' },
-  socialRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 24 },
+  socialRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 14 },
   socialButton: { width: 34, height: 34, borderRadius: 9, backgroundColor: '#233143', alignItems: 'center', justifyContent: 'center' },
   footerContent: { width: '100%', maxWidth: 720 },
   footerTitle: { color: '#F2B84B', fontSize: 14, fontWeight: '900' },
-  footerCommitment: { color: '#FFFFFF', fontSize: 11, lineHeight: 17, fontWeight: '800', marginTop: 17, marginBottom: 12 },
-  footerLine: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
+  footerCommitment: { color: '#FFFFFF', fontSize: 11, lineHeight: 15, fontWeight: '800', marginTop: 10, marginBottom: 5 },
+  footerLine: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
   footerLineText: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
   pressed: { opacity: 0.82 },
 });

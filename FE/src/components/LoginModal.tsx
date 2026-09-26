@@ -11,21 +11,24 @@ import {
   View,
 } from 'react-native';
 
+export type UserRole = 'customer' | 'employee';
+
 type LoginModalProps = {
   visible: boolean;
   onClose: () => void;
-  onLogin: (name: string) => void;
+  onLogin: (name: string, role: UserRole) => void;
 };
 
 export function LoginModal({ visible, onClose, onLogin }: LoginModalProps) {
   const [name, setName] = useState('Nguyễn Văn Nam');
   const [password, setPassword] = useState('123456');
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState<UserRole>('customer');
 
   const submit = () => {
     const normalizedName = name.trim();
     if (!normalizedName || !password.trim()) return;
-    onLogin(normalizedName);
+    onLogin(normalizedName, role);
   };
 
   return (
@@ -42,6 +45,24 @@ export function LoginModal({ visible, onClose, onLogin }: LoginModalProps) {
           </View>
           <Text style={styles.title}>Chào mừng trở lại</Text>
           <Text style={styles.subtitle}>Đăng nhập bản demo Nam Dương Salon</Text>
+
+          <Text style={styles.label}>Vai trò</Text>
+          <View style={styles.roleRow}>
+            <Pressable
+              onPress={() => setRole('customer')}
+              style={[styles.roleButton, role === 'customer' && styles.roleButtonActive]}
+            >
+              <Ionicons name="person-outline" size={18} color={role === 'customer' ? '#FFFFFF' : '#526A7F'} />
+              <Text style={[styles.roleText, role === 'customer' && styles.roleTextActive]}>Khách hàng</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setRole('employee')}
+              style={[styles.roleButton, role === 'employee' && styles.roleButtonActive]}
+            >
+              <Ionicons name="cut-outline" size={18} color={role === 'employee' ? '#FFFFFF' : '#526A7F'} />
+              <Text style={[styles.roleText, role === 'employee' && styles.roleTextActive]}>Nhân viên</Text>
+            </Pressable>
+          </View>
 
           <Text style={styles.label}>Tên người dùng</Text>
           <View style={styles.inputWrap}>
@@ -92,6 +113,11 @@ const styles = StyleSheet.create({
   title: { color: '#102A43', fontSize: 26, fontWeight: '900' },
   subtitle: { color: '#698096', fontSize: 14, marginTop: 6, marginBottom: 24 },
   label: { color: '#314B63', fontSize: 13, fontWeight: '700', marginBottom: 8 },
+  roleRow: { flexDirection: 'row', gap: 10, marginBottom: 18 },
+  roleButton: { flex: 1, minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: '#DCE4EA', backgroundColor: '#FAFCFD', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  roleButtonActive: { borderColor: '#123B5D', backgroundColor: '#123B5D' },
+  roleText: { color: '#526A7F', fontSize: 13, fontWeight: '800' },
+  roleTextActive: { color: '#FFFFFF' },
   inputWrap: { height: 52, borderRadius: 14, borderWidth: 1, borderColor: '#DCE4EA', backgroundColor: '#FAFCFD', flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 15, marginBottom: 17 },
   input: { flex: 1, color: '#102A43', fontSize: 15, outlineStyle: 'none' } as never,
   submit: { height: 54, borderRadius: 15, backgroundColor: '#123B5D', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
